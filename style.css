@@ -1,0 +1,327 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Cinzel:wght@700&display=swap');
+
+:root {
+    --gold-primary: #FFD700;
+    --gold-secondary: #FFC107;
+    --dark-bg: #0a0a0a;
+    --tile-light: #6b4e00; /* Un marrón dorado más claro y sólido */
+    --tile-dark: #2c1a00; /* Mantenemos este oscuro para contraste, pero el claro resalta */
+    --highlight-move: rgba(255, 215, 0, 0.5);
+    --highlight-check: rgba(255, 60, 60, 0.6);
+    --font-title: 'Cinzel', serif;
+    --font-main: 'Poppins', sans-serif;
+}
+
+* { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+}
+
+body {
+    font-family: var(--font-main);
+    background-color: var(--dark-bg);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 1rem;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.game-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.chess-header { 
+    text-align: center; 
+}
+.chess-title {
+    font-family: var(--font-title);
+    font-size: 2.8rem;
+    color: var(--gold-primary);
+    text-shadow: 0 0 15px var(--gold-primary);
+}
+
+.timers {
+    display: flex;
+    justify-content: space-between;
+    width: min(90vw, 600px);
+    font-size: 1.8rem;
+    font-weight: 600;
+}
+.timer {
+    background-color: #1a1a1a;
+    padding: 0.5rem 1.5rem;
+    border-radius: 8px;
+    border: 1px solid var(--gold-secondary);
+    transition: all 0.3s ease;
+}
+.timer.active {
+    box-shadow: 0 0 15px var(--gold-primary);
+    transform: scale(1.05);
+}
+
+.chessboard-wrapper {
+    width: min(90vw, 600px);
+    height: min(90vw, 600px);
+    position: relative;
+}
+
+.chessboard {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: repeat(8, 1fr); /* AÑADE ESTO */
+    width: 100%;
+    height: 100%;
+    border: 3px solid var(--gold-primary);
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.4);
+    transition: transform 0.5s ease-in-out;
+}
+
+
+.tile {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 1; /* Asegura que el tile esté por debajo de los overlays */
+}
+.tile.light { 
+    background-color: var(--tile-light); 
+}
+.tile.dark { 
+    background-color: var(--tile-dark); 
+}
+
+.highlight-overlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 2; /* Por encima del tile, por debajo de hints y pieces */
+    pointer-events: none;
+}
+.highlight-overlay.selected { 
+    background-color: var(--highlight-move); 
+    opacity: 0.8; 
+}
+.highlight-overlay.in-check { 
+    background-color: var(--highlight-check); 
+    animation: pulse-red 1.5s infinite; 
+}
+
+@keyframes pulse-red {
+    0% { box-shadow: inset 0 0 0 0 var(--highlight-check); }
+    70% { box-shadow: inset 0 0 25px 10px rgba(255, 60, 60, 0); }
+    100% { box-shadow: inset 0 0 0 0 rgba(255, 60, 60, 0); }
+}
+
+.move-hint {
+    position: absolute;
+    width: 35%;
+    height: 35%;
+    background-color: var(--highlight-move);
+    border-radius: 50%;
+    opacity: 0.7;
+    z-index: 3; /* Por encima del overlay */
+}
+.capture-hint {
+    position: absolute;
+    width: 90%;
+    height: 90%;
+    border: 4px solid var(--highlight-move);
+    border-radius: 50%;
+    z-index: 3; /* Por encima del overlay */
+}
+
+/* --- CAMBIOS IMPORTANTES AQUI --- */
+.piece {
+    width: 85%; /* Ajusta esto si los SVG son muy grandes o pequeños */
+    height: 85%; /* Ajusta esto */
+    position: relative; /* O absolute, dependiendo de tu layout, pero relative suele funcionar bien */
+    z-index: 4; /* Asegura que la pieza esté por encima de todo lo demás */
+    transition: transform 0.1s ease;
+    /* pointer-events: none; QUITA ESTO SI VAS A USAR DRAG/DROP EN LA PIEZA*/ 
+    display: flex; /* Para centrar la imagen SVG dentro */
+    justify-content: center;
+    align-items: center;
+    /* ELIMINADAS: background-size, background-repeat, background-position */
+    /* ELIMINADO: color: aqua; (no afecta a <img>) */
+}
+
+.piece img { /* Nueva regla para la imagen dentro de .piece */
+    width: 85%;
+    height: 85%;
+    object-fit: contain; /* Asegura que la imagen se escale sin distorsionarse */
+    filter: none; /* Reset, los filtros se aplican a .piece.w img o .piece.b img */
+}
+
+.piece.b img { 
+    filter: drop-shadow(0 0 3px #000000); /* Filtro para piezas blancas */
+} 
+/* Filtros aplicados directamente a la imagen SVG */
+.piece.w img { 
+    filter: drop-shadow(0 0 3px #ffffff); /* Filtro para piezas blancas */
+}
+.piece.bw img { 
+    filter: brightness(0.7) drop-shadow(0 0 3px #ffffff); /* Filtro para piezas negras */
+}
+
+
+
+
+.piece.pr img { 
+    filter: brightness(0.7) drop-shadow(0 0 3px #000000); /* Filtro para piezas negras */
+}
+
+.piece.rb img { 
+    filter: brightness(0.7) drop-shadow(0 0 3px #000000); /* Filtro para piezas negras */
+}
+.piece.nb img { 
+    filter: brightness(0.7) drop-shadow(0 0 3px #000000); /* Filtro para piezas negras */
+}
+.piece.bb img { 
+    filter: brightness(0.7) drop-shadow(0 0 3px #000000); /* Filtro para piezas negras */
+}
+.piece.kb img { 
+    filter: brightness(0.7) drop-shadow(0 0 3px #000000); /* Filtro para piezas negras */
+}
+.piece.qb img { 
+    filter: brightness(0.7) drop-shadow(0 0 3px #000000); /* Filtro para piezas negras */
+}
+
+
+.piece.selected {
+    outline: 3px solid var(--gold-primary); /* Bordes visibles */
+    border-radius: 8px;
+    box-shadow: 0 0 15px var(--gold-primary); /* Aura dorada */
+}
+
+.piece.selected img {
+    filter: none; /* No escalamos ni duplicamos filtros aquí */
+}
+
+
+
+.status-bar {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: #1a1a1a;
+    border: 1px solid var(--gold-primary);
+    border-radius: 8px;
+    text-align: center;
+    width: min(90vw, 600px);
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.controls { 
+    display: flex; 
+    gap: 1rem; 
+    margin-top: 1rem; 
+}
+button {
+    padding: 0.8rem 1.5rem;
+    background: linear-gradient(45deg, var(--gold-secondary), var(--gold-primary));
+    border: none;
+    color: #1a1a1a;
+    font-weight: bold;
+    font-size: 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: var(--font-main);
+}
+button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+}
+
+#promotion-modal {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #1a1a1a;
+    border: 2px solid var(--gold-primary);
+    z-index: 100;
+    padding: 1rem;
+    border-radius: 10px;
+    box-shadow: 0 0 20px black;
+}
+#promotion-choices {
+    display: flex;
+    gap: 1rem;
+}
+#promotion-choices .piece {
+    cursor: pointer;
+    width: 60px; /* Ajusta para el tamaño de las piezas de promoción */
+    height: 60px; /* Ajusta para el tamaño de las piezas de promoción */
+    transition: transform 0.2s ease;
+    /* Asegúrate que las imágenes dentro de estas piezas también se escalen */
+}
+#promotion-choices .piece img { /* Asegura que la imagen dentro del modal de promoción también se escale */
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+#promotion-choices .piece:hover {
+    transform: scale(1.1);
+}
+
+.history-panel {
+    width: 250px;
+    height: min(90vh, 600px);
+    background: #1a1a1a;
+    border: 1px solid var(--gold-primary);
+    border-radius: 8px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+}
+.history-title {
+    font-family: var(--font-title);
+    color: var(--gold-primary);
+    text-align: center;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+.move-history {
+    flex-grow: 1;
+    overflow-y: auto;
+    list-style: none;
+    padding: 0;
+    font-size: 1rem;
+}
+.move-history li {
+    display: flex;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+}
+.move-history li:nth-child(odd) { 
+    background: rgba(0,0,0,0.2); 
+}
+.move-number { 
+    font-weight: bold; 
+    width: 30px; 
+}
+.move-notation { 
+    flex-grow: 1; 
+}
+
+@media (max-width: 950px) {
+    body { 
+        flex-direction: column; 
+    }
+    .history-panel { 
+        width: min(90vw, 600px); 
+        height: 150px; 
+    }
+}

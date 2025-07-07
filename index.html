@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    
+
+    <meta charset="UTF-8">
+    <title>The Golden Chess - Edición Definitiva</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="game-container">
+        <div class="chess-header"><h1 class="chess-title">THE GOLDEN CHESS ♞ </h1></div>
+        
+        <div class="timers">
+            <div id="timer-b" class="timer">05:00</div>
+            <div id="timer-w" class="timer">05:00</div>
+        </div>
+
+        <div class="chessboard-wrapper">
+            <div class="chessboard" id="chessboard"></div>
+            <div id="promotion-modal">
+                <div id="promotion-choices"></div>
+            </div>
+        </div>
+
+        <div class="status-bar" id="status">Inicia la partida. Turno de las Blancas.</div>
+        <div class="controls">
+            <button id="newGame">Nueva Partida</button>
+            <button id="flipBoard">Voltear Tablero</button>
+        </div>
+    </div>
+
+    <div class="history-panel">
+        <h2 class="history-title">Historial</h2>
+        <ul class="move-history" id="move-history"></ul>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
